@@ -6,8 +6,13 @@ import { useNavigate } from "react-router-dom";
 
 
 
+
+
+
  export default function App() {
   const [hotels,setHotels] = useState([])
+  const [currentPage, setCurrentPage] = useState(1);
+  const HOTELS_PER_PAGE = 33;
  
   useEffect(() => {
     async function getHotels() {
@@ -21,6 +26,15 @@ import { useNavigate } from "react-router-dom";
     getHotels();
   }, []);
 
+  const startIndex = (currentPage - 1) * HOTELS_PER_PAGE;
+const currentHotels = hotels.slice(
+  startIndex,
+  startIndex + HOTELS_PER_PAGE
+);
+
+const totalPages = Math.ceil(hotels.length / HOTELS_PER_PAGE);
+
+
 const navigate = useNavigate();
 
 function handleViewDetails(id) {
@@ -32,12 +46,14 @@ function handleViewDetails(id) {
     navigate("/login");
   }
 }
+
+
 return (
 <div>
 
       <h1>Hotels</h1>
 
-      {hotels.map((hotel) => (
+      {currentHotels.map((hotel) => (
         <div key={hotel.id}  className="Hotels">
           <img src={hotel.thumbnail} className="image"  alt={hotel.name} width ="200"/>
           <div className="HotelDetails">
@@ -54,6 +70,36 @@ return (
          </div>
          </div>
           ))}
+           <div style={{ marginTop: "20px", textAlign: "center" }}>
+  <button
+    onClick={() => setCurrentPage(currentPage - 1)}
+    disabled={currentPage === 1}
+  >
+    Previous
+  </button>
+
+  {Array.from({ length: totalPages }, (_, index) => (
+    <button
+      key={index + 1}
+      onClick={() => setCurrentPage(index + 1)}
+      style={{
+        margin: "0 4px",
+        fontWeight: currentPage === index + 1 ? "bold" : "normal",
+        backgroundColor: currentPage === index + 1 ? "#007bff" : "",
+        color: currentPage === index + 1 ? "white" : "",
+      }}
+    >
+      {index + 1}
+    </button>
+  ))}
+
+  <button
+    onClick={() => setCurrentPage(currentPage + 1)}
+    disabled={currentPage === totalPages}
+  >
+    Next
+  </button>
+</div>   
          </div>
   );
 
